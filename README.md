@@ -1,0 +1,1 @@
+###Image recognition using handwritten alphabets is a fascinating area within computer vision and machine learning. Here's a high-level description of how you can build a model for recognizing handwritten alphabets using a Convolutional Neural Network (CNN)
