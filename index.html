@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Classifier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #5f89d6, #2a5298);
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            max-width: 420px;
+            margin: auto;
+            color: #333;
+        }
+
+        .upload-area {
+            border: 2px dashed #73a8bd;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: #e3f2fd;
+            border-color: #1e88e5;
+        }
+
+        img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            background: #70b1ea;
+            color: white;
+            padding: 12px 18px;
+            border: none;
+            margin-top: 15px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: hsl(212, 55%, 64%);
+            transform: scale(1.05);
+        }
+
+        #prediction {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="font-size: 28px; font-weight: 600; text-shadow: 2px 2px 6px rgba(0,0,0,0.3);">
+        Alphabet Classifier
+    </h1>
+    
+    <div class="container">
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <p style="font-weight: 500;">Click to Upload an Image</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none" onchange="previewImage(event)">
+        </div>
+
+        <img id="preview" src="" alt="Uploaded Image" style="display: none;">
+        
+        <button onclick="classifyImage()">Classify Alphabet</button>
+        
+        <p id="prediction"></p>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = "block";
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function classifyImage() {
+            const fileInput = document.getElementById("fileInput").files[0];
+            if (!fileInput) {
+                alert("Please upload an image first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput);
+
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("prediction").innerText = `Predicted Alphabet: ${data.prediction} (Confidence: ${(data.confidence * 100).toFixed(2)}%)`;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("prediction").innerText = "Error in prediction.";
+            });
+        }
+    </script>
+
+</body>
+</html>
